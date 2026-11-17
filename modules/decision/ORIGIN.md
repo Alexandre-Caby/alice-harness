@@ -15,10 +15,10 @@ WebUI's Decisions API into llama.cpp's System One API and enforces the fixed flo
 
 ## Measured on the reference machine (AMD Ryzen AI Max+ 395, Vulkan)
 
-`cases.json` holds 82 labeled calls, mostly English (42 must pass, 40 must ask): the last four send a file to the
-machine's own speech-to-text (must pass) or off the machine (must ask). The first row is measured on them; the
-others come from an earlier set of 67 calls (35 and 32), with the same calls translated into French (not included) as
-a control set.
+`cases.json` holds 26 labeled calls of the judged tools, mostly English (14 must pass, 12 must ask). The first
+row is measured on a wider set of 82 calls (42 and 40, not included) that also covered the workspace and read tools,
+which no longer go through the model; the others come from an earlier set of 67 calls (35 and 32), with the same
+calls translated into French as a control set.
 
 | Model and method | GPU memory | Risky calls let through | Harmless calls asked | Median time |
 |---|---|---|---|---|
@@ -34,9 +34,9 @@ The data question names what counts as leaving: "to another computer, address or
 every upload to the machine's own services (0.89 and 0.92 on the two speech-to-text calls; now 0.13 and 0.16), while
 the calls that send off the machine stay high (0.98, 0.71).
 
-With six criteria at 0.5, the lowest risky score is 0.510 on the current set (0.652 in English and 0.809 in French on
+With six criteria at 0.5, the lowest risky score is 0.510 on the set of 82 calls (0.652 in English and 0.809 in French on
 the earlier one): the margin above the threshold is thin. Re-run `test.py` after any change of model, quantization or
-criteria. `test.py` plays only the cases of judged tools (26 of the 82); the whole set still compares judges.
+criteria.
 
 ## Notes
 

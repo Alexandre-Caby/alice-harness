@@ -84,7 +84,7 @@ discover() {
   INSTALLED='' PARTIAL=''
   local os ram gpu missing=() prefix
   prefix=$(current ALICE_PREFIX)
-  # The core network is created first: with it and no Open WebUI, an earlier run stopped halfway.
+  # A core network without Open WebUI is an unfinished installation.
   if [ -n "$prefix" ]; then
     if [ -n "$(docker ps -aq --filter "name=^$prefix-openwebui$" 2>/dev/null)" ]; then INSTALLED=1
     elif docker network ls --format '{{.Name}}' 2>/dev/null | grep -x "$(current ALICE_NET_CORE)" >/dev/null; then INSTALLED=1 PARTIAL=1; fi
@@ -486,8 +486,8 @@ module_settings() {
   esac
 }
 
-# Modules already running, with the same settings and time zone, are left as they are. Running is checked on the
-# containers, not read from machine.env: an interrupted install saves modules it never started.
+# Modules already running, with the same settings and time zone, are left as they are. Running is read from the
+# containers: machine.env may list a module that never started.
 change_modules() {
   local m keep=() zone running
   local -A was=()

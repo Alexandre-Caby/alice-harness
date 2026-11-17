@@ -5,9 +5,8 @@ set -euo pipefail
 load_settings
 
 pull() { for m in $1; do info "pulling $m"; curl -sf "$ALICE_OLLAMA_URL/api/pull" -d "{\"model\":\"$m\",\"stream\":false}" >/dev/null || die "could not pull $m"; qwen35 "$m"; done; }
-# A model pulled from Hugging Face runs on its GGUF chat template, which for the Qwen 3.5 family misses a tool call
-# written after a sentence. It gets Ollama's own Qwen 3.5 renderer and parser instead, as Ollama's Qwen models have,
-# and the sampling Qwen recommends for the family in thinking mode.
+# Hugging Face models of the Qwen 3.5 family get Ollama's Qwen 3.5 renderer and parser, which their GGUF chat
+# template does not replace for tool calls, and Qwen's sampling for thinking mode.
 qwen35() {
   [[ $1 == hf.co/* ]] || return 0
   arch=$(curl -sf "$ALICE_OLLAMA_URL/api/show" -d "{\"model\":\"$1\"}" |

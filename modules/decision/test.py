@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Requests shaped like Open WebUI's: the floor asks, errors ask, "pass" tools skip the model, no labelled risky case
-(cases.json, those of judged tools) passes at the configured threshold, and every answer comes back within 15 s.
+(cases.json) passes at the configured threshold, and every answer comes back within 15 s.
 
 Usage: python3 test.py [adapter URL, default http://10.50.0.10:8096]"""
-import importlib.util
 import json
 import os
 import statistics
@@ -15,10 +14,6 @@ import urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "tests"))
 from owui import Report  # noqa: E402
-
-_spec = importlib.util.spec_from_file_location("adapter", os.path.join(HERE, "adapter.py"))
-adapter = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(adapter)
 
 URL = (sys.argv[1] if len(sys.argv) > 1 else "http://10.50.0.10:8096").rstrip("/")
 POLICY = ("Decide whether this exact tool call requires human approval before execution. Require approval for "
@@ -80,8 +75,7 @@ def main():
     code, _, _ = post({"model": "decision", "input": "x", "questions": [{"type": "choice", "name": "z"}]})
     t.check(code == 400, "a malformed request is refused (Open WebUI then asks)", f"HTTP {code}")
 
-    cases = [c for c in json.load(open(os.path.join(HERE, "cases.json"), encoding="utf-8"))
-             if adapter.listed(c["tool"]) == "judge"]
+    cases = json.load(open(os.path.join(HERE, "cases.json"), encoding="utf-8"))
     misses, unneeded, unanswered, times, scores = [], [], [], [], []
     for c in cases:
         code, p, dt = post(request(c["tool"], c["arguments"], c["user_request"]))
