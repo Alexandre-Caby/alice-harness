@@ -1,0 +1,83 @@
+# Tools that may run without asking; anything else always asks.
+# "pass": runs without the decision model. Otherwise the decision model judges the call.
+# Names as Open WebUI sees them: <server id>_<tool>.
+
+# Open Terminal: the workspace has no internet and no access to the rest of the server, and its files are in the
+# nightly backup, so nothing done there leaves or is lost for good.
+run_command             pass
+write_file              pass
+replace_file_content    pass
+list_files              pass
+read_file               pass
+display_file            pass
+grep_search             pass
+match_files             pass
+search_files            pass
+glob_search             pass
+list_processes          pass
+get_process_status      pass
+read_user_terminal      pass
+send_process_input      pass
+kill_process            pass
+
+# Any MCP server: read tools are judged, the rest ask
+*_get_*
+*_list_*
+*_search_*
+*_read_*
+
+# Home Assistant MCP: reads and on/off (broadcast, timers, removals ask)
+*_homeassistant__GetLiveContext
+*_llm__GetDateTime
+*_todo__get_items
+*_intent__HassTurnOn
+*_intent__HassTurnOff
+*_todo__HassListAddItem
+*_todo__HassListCompleteItem
+
+# n8n MCP: building (unpublished) and running workflows are judged; publish, update and delete ask
+*_validate_workflow
+*_validate_node_config
+*_create_workflow_from_code
+*_execute_workflow
+
+# Open WebUI built-in tools that act outside or keep something: judged
+search_web
+fetch_url
+add_memory
+update_memory
+replace_memory_content
+create_automation
+update_automation
+toggle_automation
+create_calendar_event
+update_calendar_event
+
+# Open WebUI built-in tools that read the person's own data or use this server's own services
+list_knowledge          pass
+list_knowledge_bases    pass
+view_knowledge_file     pass
+query_knowledge_files   pass
+query_knowledge_bases   pass
+search_knowledge_files  pass
+search_knowledge_bases  pass
+grep_knowledge_files    pass
+search_notes            pass
+search_chats            pass
+search_memories         pass
+list_memories           pass
+recall_memories         pass
+create_tasks            pass
+update_task             pass
+list_automations        pass
+search_calendar_events  pass
+get_current_timestamp   pass
+calculate_timestamp     pass
+list_chat_files         pass
+query_chat_files        pass
+grep_chat_files         pass
+view_file               pass
+view_chat               pass
+view_note               pass
+generate_image          pass
+edit_image              pass

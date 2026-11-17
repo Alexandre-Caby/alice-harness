@@ -1,0 +1,11 @@
+[Unit]
+Description=A.L.I.C.E. Harness: alert when the secret store waits for unlock
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash {{ROOT}}/doctor/health.sh boot
+
+[Install]
+WantedBy=multi-user.target

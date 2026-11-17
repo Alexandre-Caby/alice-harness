@@ -1,0 +1,10 @@
+base-url: "{{BASE_URL}}"
+listen-http: ":8080"
+behind-proxy: true
+auth-file: "/var/lib/ntfy/user.db"
+auth-default-access: "deny-all"
+cache-file: "/var/lib/ntfy/cache.db"
+cache-duration: "12h"
+keepalive-interval: "45s"
+enable-signup: false
+enable-login: true

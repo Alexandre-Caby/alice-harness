@@ -1,0 +1,35 @@
+--- a/backend/open_webui/utils/tool_permissions.py
++++ b/backend/open_webui/utils/tool_permissions.py
+@@ -75,6 +75,10 @@
+     config = await Config.get_many('chat.tool_permissions.enable', 'chat.tool_permissions.auto.enable')
+     enabled = config['chat.tool_permissions.enable']
+     auto_enabled = enabled and config['chat.tool_permissions.auto.enable']
++    # A.L.I.C.E. Harness: there is no "full access" mode. A chat asking for it gets the default mode (auto approval,
++    # or approval on every call) before the mode enters the request, so every later step sees the same mode.
++    if value == 'full' and enabled:
++        value = None
+     if is_channel_chat:
+         if value == 'auto':
+             raise HTTPException(400, 'Auto tool permissions are not supported in channel chats.')
+@@ -115,6 +119,10 @@
+ 
+ async def requires_tool_approval(form_data, metadata, call, tool, params):
+     mode = metadata.get('params', {}).get('tool_approval_mode', 'full')
++    # A.L.I.C.E. Harness: safety net for a request that arrives without a mode, or in full access by another path;
++    # the call is then reviewed as in auto mode (without auto approval configured, approval is required).
++    if mode == 'full':
++        mode = 'auto'
+     if mode == 'full' or (call.get('name') == 'ask_user' and tool.get('type') == 'builtin'):
+         return False
+     fingerprint = tool_permission_fingerprint(call, tool, params, metadata)
+@@ -192,7 +200,9 @@
+             }
+         ],
+     }
+-    async with asyncio.timeout(5):
++    # A.L.I.C.E. Harness: a local decision model judging a call that carries code, while the chat model shares the
++    # GPU, can take longer than 5 s; past the limit the call waits for approval, which is safe but needless.
++    async with asyncio.timeout(15):
+         response = await post_decisions(payload, settings['api_base_url'], settings['api_key'])
+     probability = parse_decision_scores(response, {'requires_confirmation'})['requires_confirmation']
+     call['permission_review'] = {'engine': 'decisions', 'probability': probability, 'threshold': threshold}

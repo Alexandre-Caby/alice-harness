@@ -1,0 +1,11 @@
+machine.env
+*.secrets
+secrets.env
+*.local
+.state/
+
+__pycache__/
+*.pyc
+.test-output/
+
+.shellcheckrc

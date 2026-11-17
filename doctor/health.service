@@ -1,0 +1,9 @@
+[Unit]
+Description=A.L.I.C.E. Harness health check (alerts only on a change)
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash {{ROOT}}/doctor/health.sh check
+Nice=10
+TimeoutStartSec=30min

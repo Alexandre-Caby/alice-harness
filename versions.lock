@@ -1,0 +1,47 @@
+# Core
+OPENWEBUI_IMAGE=ghcr.io/open-webui/open-webui:v0.13.3@sha256:46b59158e6558eeb980bc828e0f1b30238ad24d82ed84d5e5eda1dab2a082f14
+# approval.patch targets this exact upstream file.
+OPENWEBUI_APPROVAL_FILE_SHA256=8d9953f13d5604ae504d559de77632f27eeb40cc5073405123d6c70e04e91513
+OLLAMA_VERSION=0.40.16
+OLLAMA_INSTALL_SHA256=25f64b810b947145095956533e1bdf56eacea2673c55a7e586be4515fc882c9f
+# Installer UI (charmbracelet/gum, MIT)
+GUM_VERSION=0.17.0
+GUM_SHA256_x86_64=69ee169bd6387331928864e94d47ed01ef649fbfe875baed1bbf27b5377a6fdb
+GUM_SHA256_arm64=b0b9ed95cbf7c8b7073f17b9591811f5c001e33c7cfd066ca83ce8a07c576f9c
+
+# Modules
+UBUNTU_IMAGE=ubuntu:24.04@sha256:2198e4c65076e9cb0b3d695219df667c0e3b0072da64ca3c2648aca17dcecaf5
+TIKA_IMAGE=apache/tika:4.2.0-full@sha256:4774eaac44f86cdf648ae7b5a367016eaf6f9052adec31e5cff07cff1a0c6e24
+LLAMACPP_SERVER_IMAGE=ghcr.io/ggml-org/llama.cpp:server-vulkan@sha256:784bb87c7b22cf8653322f3680f33e1fd013d122d817441d5d2fc6410dee68da
+SDCPP_COMMIT=e41fbcf
+QWEN_TTS_COMMIT=ef339be58a778b062e1c14382347964552eae007
+OPEN_TERMINAL_IMAGE=ghcr.io/open-webui/open-terminal:0.17.8@sha256:e4295cce2c3cc9273e9cba2bfb671576e76532e5217f7f6d833c28f09f823ef9
+HOME_ASSISTANT_IMAGE=ghcr.io/home-assistant/home-assistant:2026.11.1@sha256:6785d1eca68747a524c156faae1b139ed415c07357386ae6fe17291986e59e82
+N8N_IMAGE=docker.n8n.io/n8nio/n8n:2.47.7@sha256:b4b90747b81fcda7e76550c0d3aa7f0f64917a1e9573cff40d6834eaf2e0f8ea
+RESTIC_IMAGE=restic/restic:0.19.1@sha256:136600b6ff6843d61d355f7f71f460a166429f35de6fd11b568fece3c9a4d510
+NTFY_IMAGE=binwiederhier/ntfy:v2.37.2@sha256:1875ddcf815c8a3c981d6d78c67a93452d0abba79b1ab9520b1f5f5238902bd7
+
+# The decision threshold is calibrated for this exact file.
+DECISION_MODEL_URL=https://huggingface.co/ggml-org/OpenJev-GGUF/resolve/10840f375658dea7afc5ff4711127bca8218b560/OpenJev-Q4_K_M.gguf
+DECISION_MODEL_SHA256=38b512277edaeec6cd251d146bff6d97bc328fa9db19755401d6e9ab1ccbcba5
+PYTHON_IMAGE=python:3.12-slim@sha256:c3d81d25b3154142b0b42eb1e61300024426268edeb5b5a26dd7ddf64d9daf28
+
+# Image model files
+IMAGES_DIFFUSION_URL=https://huggingface.co/AtomicChat/FLUX-3-Image-Klein-GGUF/resolve/main/FLUX-3-Image-Klein-AD-Q5_K.gguf
+IMAGES_DIFFUSION_SHA256=2a7b09de30849a87e4ed5da5a789c2c5b596779aa6d367c133028c78f02cadd9
+IMAGES_TEXT_ENCODER_URL=https://huggingface.co/AtomicChat/FLUX-3-Image-Klein-GGUF/resolve/main/text_encoders/Qwen3-VL-4B-Instruct-Q8_0.gguf
+IMAGES_TEXT_ENCODER_SHA256=affd2cfb43ebfecf6134f89d5c4778ce7b9fd33294b13bb761d7dce84f15a08a
+IMAGES_VAE_URL=https://huggingface.co/AtomicChat/FLUX-3-Image-Klein-GGUF/resolve/main/vae/ae.safetensors
+IMAGES_VAE_SHA256=868fe7b343cc8f3a19dbcfcafbc3d5f888802be3f89bd81b65b3621a066ce8f3
+
+# Speech-to-text
+NEMO_SPEECH_COMMIT=536b17a41bef62d2a67a40ed3df61df26a4389fe
+STT_MODEL_URL=https://huggingface.co/AtomicChat/NVIDIA-Nemotron-3.5-Transcribe-30B-A4B-GGUF/resolve/main/NVIDIA-Nemotron-3.5-Transcribe-30B-A4B-AD-IQ4_NL.gguf
+STT_MODEL_SHA256=0c47d4ab6c783e7606ec03714b354fab0b2052027a7ea1991e7e2d3009c345ad
+STT_ENCODER_URL=https://huggingface.co/AtomicChat/NVIDIA-Nemotron-3.5-Transcribe-30B-A4B-GGUF/resolve/main/NVIDIA-Nemotron-3.5-Transcribe-30B-A4B-Encoder-F16.gguf
+STT_ENCODER_SHA256=4221029c8a565c4a80c507ffa760c716e595acf663f9f4273ce69910050e7ba2
+
+# Text-to-speech
+TTS_MODEL_REPO=Qwen/Qwen3-TTS-12Hz-0.6B-Base
+TTS_MODEL_REVISION=5d83992436eae1d760afd27aff78a71d676296fc
+TTS_MODEL_SHA256=180b3b10eb1c9f1b4db7806d5475bae3071c0243c299d49926bab1da3b6946f6
