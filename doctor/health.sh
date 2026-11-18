@@ -26,7 +26,10 @@ case "${1:-}" in
     for t in open-webui ollama ocr workspace home-assistant n8n ntfy backup security egress; do
       [[ " open-webui ollama security egress $ALICE_MODULES " == *" $t "* ]] && light+=("$t")
     done
-    bash "$ALICE_ROOT/doctor/doctor.sh" "${light[@]}" > "$dir/health.txt" 2>&1
+    status=0
+    ALICE_CHECK_OPTIONAL=1 bash "$ALICE_ROOT/doctor/doctor.sh" "${light[@]}" > "$dir/health.txt" 2>&1 || status=$?
+    # Another check is running (an update, most often): this round is skipped.
+    [ "$status" -ne 75 ] || exit 0
     if grep -q '^doctor: ' "$dir/health.txt"; then failing=$(sed -n 's/^doctor: failed: //p' "$dir/health.txt")
     else failing="the health check itself (it stopped before the end)"; fi
     [ "$failing" = "$(cat "$dir/failing" 2>/dev/null)" ] && exit 0

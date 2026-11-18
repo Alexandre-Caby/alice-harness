@@ -1,4 +1,5 @@
 machine.env
+/data/
 *.secrets
 secrets.env
 *.local

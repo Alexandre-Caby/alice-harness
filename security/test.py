@@ -8,6 +8,7 @@
 Usage: python3 test.py   (reads machine.env and versions.lock)"""
 import os
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 import sys
 import urllib.parse
 
@@ -39,20 +40,24 @@ def main():
     egress = set(docker("network", "inspect", m["ALICE_NET_EGRESS"], "-f", "{{range .Containers}}{{.Name}} {{end}}").split())
     ours = [c for c in docker("ps", "--format", "{{.Names}}").split() if c.startswith(prefix + "-")]
     webui = f"{prefix}-openwebui"
-    repo = os.path.realpath(ROOT) + os.sep
+    repo, data = os.path.realpath(ROOT) + os.sep, os.path.realpath(m["ALICE_DATA_DIR"]) + os.sep
     t = Report("security")
     t.check(webui in ours, "Open WebUI is running")
-    for c in ours:
-        out = reaches(image, c, "1.1.1.1", 443)
-        t.check(out == ("reached" if c in egress else "blocked"),
-                f"{c} {'reaches' if c in egress else 'cannot reach'} the internet", out)
-        out = reaches(image, c, gateway, ollama_port)
-        t.check(out == ("reached" if c == webui else "blocked"), f"{c} {'reaches' if c == webui else 'cannot reach'} Ollama", out)
-        t.check(reaches(image, c, gateway, 22) == "blocked", f"{c} cannot reach SSH on the machine")
-        ports = docker("port", c)
+    def probe(c):
+        return (reaches(image, c, "1.1.1.1", 443), reaches(image, c, gateway, ollama_port), reaches(image, c, gateway, 22),
+                docker("port", c), docker("container", "inspect", c, "-f", "{{range .Mounts}}{{.Source}} {{end}}").split())
+
+    # A blocked connection only shows after its timeout: the containers are probed side by side.
+    with ThreadPoolExecutor(8) as pool:
+        probes = list(pool.map(probe, ours))
+    for c, (internet, ollama, ssh, ports, mounts) in zip(ours, probes):
+        t.check(internet == ("reached" if c in egress else "blocked"),
+                f"{c} {'reaches' if c in egress else 'cannot reach'} the internet", internet)
+        t.check(ollama == ("reached" if c == webui else "blocked"), f"{c} {'reaches' if c == webui else 'cannot reach'} Ollama", ollama)
+        t.check(ssh == "blocked", f"{c} cannot reach SSH on the machine")
         t.check(not ports, f"{c} publishes no port on the machine", ports)
-        mounts = docker("container", "inspect", c, "-f", "{{range .Mounts}}{{.Source}} {{end}}").split()
-        from_repo = [m for m in mounts if os.path.realpath(m).startswith(repo)]
+        # The data folder may sit inside the repository folder.
+        from_repo = [s for s in map(os.path.realpath, mounts) if s.startswith(repo) and not (s + os.sep).startswith(data)]
         t.check(not from_repo, f"{c} mounts nothing from the repository", " ".join(from_repo))
     t.done()
 

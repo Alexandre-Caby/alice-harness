@@ -20,6 +20,13 @@ declare -A url=(
 # No secrets in the report, so it can be world-readable.
 report=$ALICE_DATA_DIR/doctor/last.txt
 mkdir -p "$(dirname "$report")"
+# One check at a time: two would share the test workspace and the report. The hourly check gives way (exit 75).
+exec 9> "$ALICE_DATA_DIR/doctor/lock"
+if ! flock -n 9; then
+  [ -z "${ALICE_CHECK_OPTIONAL:-}" ] || exit 75
+  echo "waiting for another check to finish"
+  flock 9
+fi
 : > "$report"
 chmod 644 "$report"
 exec > >(tee "$report") 2>&1
@@ -27,8 +34,9 @@ failed=()
 only=" $* "
 run() {  # label, command...
   [ "$only" = "  " ] || [[ "$only" == *" $1 "* ]] || return 0
+  local start=$SECONDS
   "${@:2}" || failed+=("$1")
-  echo
+  printf '  %s s\n\n' "$((SECONDS - start))"
 }
 run open-webui python3 -I -B "$ALICE_ROOT/core/open-webui/test.py" "$(name openwebui)"
 # The doctor runs on the host.

@@ -799,12 +799,12 @@ sys.exit(0 if any(n.overlaps(i.ip_network(u, strict=False)) for u in sys.argv[2:
   done
   dir=$(value ALICE_DATA_DIR)
   if [ "$prefix" != "$(current ALICE_PREFIX)" ]; then
-    if [ "$prefix" = alice ]; then dir=/srv/alice-harness; else dir=/srv/$prefix-harness; fi
+    dir=/srv/$prefix-harness/data
   fi
   while :; do
     dir=$(ui_ask "Folder for its data (models, accounts, chats)" "$dir")
     [[ $dir == /?*/?* || $dir == /srv/?* ]] && break
-    ui_warn "A full path, such as /srv/$prefix-harness."
+    ui_warn "A full path, such as /srv/$prefix-harness/data."
   done
   answers[ALICE_DATA_DIR]=$dir
 }

@@ -2,7 +2,7 @@
 Description=A.L.I.C.E. Harness health check every hour
 
 [Timer]
-OnBootSec=15min
+OnActiveSec=15min
 OnUnitActiveSec=1h
 
 [Install]

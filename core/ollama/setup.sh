@@ -25,7 +25,9 @@ if [ "$ALICE_OLLAMA_MODE" = external ]; then
   exit 0
 fi
 [ "$ALICE_OLLAMA_MODE" = native ] || die "ALICE_OLLAMA_MODE must be native or external"
+changed=
 if [ "$(ollama --version 2>/dev/null | grep -o '[0-9][0-9.]*' | tail -1)" != "$OLLAMA_VERSION" ]; then
+  changed=1
   info "installing Ollama $OLLAMA_VERSION"
   fetch "https://raw.githubusercontent.com/ollama/ollama/v$OLLAMA_VERSION/scripts/install.sh" "$OLLAMA_INSTALL_SHA256" \
     "$ALICE_DATA_DIR/ollama/install-$OLLAMA_VERSION.sh"
@@ -35,15 +37,19 @@ fi
 dropins=/etc/systemd/system/ollama.service.d
 mkdir -p "$dropins"
 rm -f "$dropins/alice-harness.conf"
-sed -e "s/{{MAX_LOADED_MODELS}}/$ALICE_OLLAMA_MAX_LOADED_MODELS/" -e "s/{{NUM_PARALLEL}}/$ALICE_OLLAMA_NUM_PARALLEL/" \
-  -e "s/{{CONTEXT_LENGTH}}/${ALICE_OLLAMA_CONTEXT_LENGTH:-65536}/" \
-  "$ALICE_ROOT/core/ollama/ollama.conf" > "$dropins/zz-alice-harness.conf"
+conf=$(sed -e "s/{{MAX_LOADED_MODELS}}/$ALICE_OLLAMA_MAX_LOADED_MODELS/" -e "s/{{NUM_PARALLEL}}/$ALICE_OLLAMA_NUM_PARALLEL/" \
+  -e "s/{{CONTEXT_LENGTH}}/${ALICE_OLLAMA_CONTEXT_LENGTH:-65536}/" "$ALICE_ROOT/core/ollama/ollama.conf")
+if [ "$conf" != "$(cat "$dropins/zz-alice-harness.conf" 2>/dev/null)" ]; then
+  changed=1
+  printf '%s\n' "$conf" > "$dropins/zz-alice-harness.conf"
+fi
 for f in "$dropins"/*.conf; do
   [ "$f" = "$dropins/zz-alice-harness.conf" ] || ! grep -q OLLAMA_ "$f" || info "note: $f also sets Ollama values; the harness's win"
 done
 systemctl daemon-reload
 systemctl enable --now ollama >/dev/null
-systemctl restart ollama
+# A restart unloads every model and cuts the chats in progress: only when something changed.
+if [ -n "$changed" ] || ! curl -sf -m 2 http://127.0.0.1:11434/api/version >/dev/null; then systemctl restart ollama; fi
 for _ in $(seq 1 30); do curl -sf -m 2 http://127.0.0.1:11434/api/version >/dev/null && break; sleep 1; done
 
 info "models"

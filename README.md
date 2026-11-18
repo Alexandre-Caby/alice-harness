@@ -88,8 +88,8 @@ file's chat template, which misses some tool calls, and Qwen's recommended sampl
 ## Quick start
 
 ```bash
-git clone https://github.com/Alexandre-Caby/alice-harness.git
-cd alice-harness
+sudo git clone https://github.com/Alexandre-Caby/alice-harness.git /srv/alice-harness
+cd /srv/alice-harness
 sudo ./install.sh
 ```
 

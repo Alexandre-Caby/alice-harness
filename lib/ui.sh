@@ -139,7 +139,7 @@ ui_wait() {
 ui_repeat() { local s; printf -v s '%*s' "$2" ''; printf '%s' "${s// /$1}"; }
 
 # Progress meters rewrite their line with \r: only the latest piece counts.
-ui_last_line() { tail -c 4096 "$UI_LOG" 2>/dev/null | tr '\r\t' '\n ' | grep -v '^ *$' | tail -n 1 || true; }
+ui_last_line() { tail -c 4096 "$UI_LOG" 2>/dev/null | tr '\r\t' '\n ' | grep -a -v '^ *$' | tail -n 1 || true; }
 
 # ui_progress "label|command"...   exits on the first failing step
 # With UI_STEP_TOTAL and UI_STEP_DONE (a regex), a step also advances the bar each time its log gets a matching line.
